@@ -65,7 +65,6 @@ public class TNSRuleMinerNodeModel extends NodeModel {
 	 */
 	protected TNSRuleMinerNodeModel() {
 
-		// TODO one incoming port and one outgoing port is assumed
 		super(1, 1);
 	}
 
