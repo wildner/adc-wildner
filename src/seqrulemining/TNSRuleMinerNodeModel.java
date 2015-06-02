@@ -35,12 +35,13 @@ import ca.pfv.spmf.datastructures.redblacktree.RedBlackTree;
 import ca.pfv.spmf.input.sequence_database_array_integers.SequenceDatabase;
 
 /**
- * This is the model implementation of TNSRuleMiner. Mining the Top-K
+ * <code>NodeModel</code> for the "TNSRuleMiner" node, mining the Top-K
  * Non-Redundant Sequential Rules (TNS) from the spmf-library
  * (http://www.philippe-fournier-viger.com/spmf)
  * 
  * @author Manuel Wildner
  */
+
 public class TNSRuleMinerNodeModel extends NodeModel {
 
 	// the logger instance
@@ -48,22 +49,9 @@ public class TNSRuleMinerNodeModel extends NodeModel {
 			.getLogger(TNSRuleMinerNodeModel.class);
 
 	/**
-	 * the settings key which is used to retrieve and store the settings (from
-	 * the dialog or from a settings file) (package visibility to be usable from
-	 * the dialog).
+	 * The settings models for the dialog components to handle user settings.
 	 */
-	static final String CFGKEY_COUNT = "Count";
 
-	/** initial default count value. */
-	static final int DEFAULT_COUNT = 100;
-
-	// example value: the models count variable filled from the dialog
-	// and used in the models execution method. The default components of the
-	// dialog work with "SettingsModels".
-//	private final SettingsModelIntegerBounded m_count = new SettingsModelIntegerBounded(
-//			TNSRuleMinerNodeModel.CFGKEY_COUNT,
-//			TNSRuleMinerNodeModel.DEFAULT_COUNT, Integer.MIN_VALUE,
-//			Integer.MAX_VALUE);
 	private SettingsModelIntegerBounded m_kSelection = createKModel();
 	private SettingsModelDoubleBounded m_minConfSelection = createMinConfModel();
 	private SettingsModelIntegerBounded m_deltaSelection = createDeltaModel();
@@ -71,16 +59,6 @@ public class TNSRuleMinerNodeModel extends NodeModel {
 	private int k = 10;
 	private double minConf = 0.5;
 	private int delta = 2;
-
-	// private String testString =
-	// "1000 -1 1002 -1 1004 -1 1006 -1 1008 -1 10010 "
-	// + "-1 10012 -1 10014 -1 10016 -1 10018 -1 10020 -1 10022 -1 10024 "
-	// + "-1 10026 -1 10028 -1 10030 -1 10032 -1 10034 -1 10036 -1 10038 "
-	// + "-1 10040 -1 10042 -1 10044 -1 10046 -1 10048 -1 10050 -1 10052 "
-	// + "-1 10054 -1 10056 -1 10058 -1 10060 -1 10062 -1 10064 -1 -2";
-//	private String testString = "2 -1 3 -1 35 -1 12 -1 4 -1 53 -1 77 -1 41 "
-//			+ "-1 1000 -1 1002 -1 1004 -1 1006 -1 1008 -1 133 "
-//			+ "-1 10012 -1 10014 -1 10016 -1 10018 -1 10020 -1 10022 -1 10024 -1 -2";
 
 	/**
 	 * Constructor for the node model.
@@ -111,6 +89,7 @@ public class TNSRuleMinerNodeModel extends NodeModel {
 		 */
 		int seqColPos = inDataSpec.findColumnIndex(m_SeqColumnSelection
 				.getStringValue());
+		
 		/*
 		 * update k, minconf and delta which is specified by the user
 		 */
@@ -130,11 +109,9 @@ public class TNSRuleMinerNodeModel extends NodeModel {
 		DataTableSpec outputSpec = new DataTableSpec(allColSpecs);
 
 		SequenceDatabase database = new SequenceDatabase();
-		// let's add m_count rows to it
 		while (rowIter.hasNext()) {
 			String[] inputTokens = ((StringCell) (rowIter.next()
 					.getCell(seqColPos))).getStringValue().split(" ");
-			// inputTokens = testString.split(" ");
 			database.addSequence(inputTokens);
 //			for (String s : inputTokens) {
 //				System.out.print(s + " ");
@@ -204,10 +181,6 @@ public class TNSRuleMinerNodeModel extends NodeModel {
 	 */
 	@Override
 	protected void saveSettingsTo(final NodeSettingsWO settings) {
-
-		// TODO save user settings to the config object.
-
-//		m_count.saveSettingsTo(settings);
 		m_deltaSelection.saveSettingsTo(settings);
 		m_kSelection.saveSettingsTo(settings);
 		m_minConfSelection.saveSettingsTo(settings);
@@ -220,12 +193,6 @@ public class TNSRuleMinerNodeModel extends NodeModel {
 	@Override
 	protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
 			throws InvalidSettingsException {
-
-		// TODO load (valid) settings from the config object.
-		// It can be safely assumed that the settings are valided by the
-		// method below.
-
-//		m_count.loadSettingsFrom(settings);
 		m_deltaSelection.loadSettingsFrom(settings);
 		m_kSelection.loadSettingsFrom(settings);
 		m_minConfSelection.loadSettingsFrom(settings);
@@ -238,13 +205,6 @@ public class TNSRuleMinerNodeModel extends NodeModel {
 	@Override
 	protected void validateSettings(final NodeSettingsRO settings)
 			throws InvalidSettingsException {
-
-		// TODO check if the settings could be applied to our model
-		// e.g. if the count is in a certain range (which is ensured by the
-		// SettingsModel).
-		// Do not actually set any values of any member variables.
-
-//		m_count.validateSettings(settings);
 		m_deltaSelection.validateSettings(settings);
 		m_kSelection.validateSettings(settings);
 		m_minConfSelection.validateSettings(settings);

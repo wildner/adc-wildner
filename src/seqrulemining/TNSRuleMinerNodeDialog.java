@@ -7,8 +7,8 @@ import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelectio
 import org.knime.core.node.defaultnodesettings.DialogComponentNumber;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 /**
- * <code>NodeDialog</code> for the "TNSRuleMiner" Node.
- * Mining the Top-K Non-Redundant Sequential Rules (TNS) from the spmf-library (http://www.philippe-fournier-viger.com/spmf)
+ * <code>NodeDialog</code> for the "TNSRuleMiner" node, 
+ * mining the Top-K Non-Redundant Sequential Rules (TNS) from the spmf-library (http://www.philippe-fournier-viger.com/spmf)
  *
  * This node dialog derives from {@link DefaultNodeSettingsPane} which allows
  * creation of a simple dialog with standard components. If you need a more 
@@ -20,19 +20,11 @@ import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 public class TNSRuleMinerNodeDialog extends DefaultNodeSettingsPane {
 
     /**
-     * New pane for configuring TNSRuleMiner node dialog.
-     * This is just a suggestion to demonstrate possible default dialog
-     * components.
+     * The dialog pane for the TNSRuleMiner node.
      */
     protected TNSRuleMinerNodeDialog() {
         super();
         
-//        addDialogComponent(new DialogComponentNumber(
-//                new SettingsModelIntegerBounded(
-//                    TNSRuleMinerNodeModel.CFGKEY_COUNT,
-//                    TNSRuleMinerNodeModel.DEFAULT_COUNT,
-//                    Integer.MIN_VALUE, Integer.MAX_VALUE),
-//                    "Counter:", /*step*/ 1, /*componentwidth*/ 5));
         addDialogComponent(new DialogComponentColumnNameSelection(TNSRuleMinerNodeModel.createSeqColumnModel(),
 						"Column containing the sequences: ", 0, true, StringValue.class));
         addDialogComponent(new DialogComponentNumber(TNSRuleMinerNodeModel.createKModel(), "Choose k", 1));
