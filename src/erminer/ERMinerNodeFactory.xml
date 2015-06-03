@@ -7,7 +7,7 @@
     </shortDescription>
     
     <fullDescription>
-        <intro>Insert long description here...</intro>
+        <intro>Mining sequential rules using the ERMiner from the spmf-library (http://www.philippe-fournier-viger.com/spmf)</intro>
         
         
         <option name="short name of first option (like in the dialog)">description of first option</option>

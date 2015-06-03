@@ -104,10 +104,10 @@ public class ERMinerNodeModel extends NodeModel {
 			String[] inputTokens = ((StringCell) (rowIter.next()
 					.getCell(seqColPos))).getStringValue().split(" ");
 			database.addSequence(inputTokens);
-			for (String s : inputTokens) {
-				System.out.print(s + " ");
-			}
-			System.out.println("");
+//			for (String s : inputTokens) {
+//				System.out.print(s + " ");
+//			}
+//			System.out.println("");
 		}
 //		StringBuilder builder = new StringBuilder();
 //		while (rowIter.hasNext()) {

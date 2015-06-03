@@ -5,7 +5,7 @@ import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
 import org.knime.core.node.defaultnodesettings.DialogComponentNumber;
 
-import seqrulemining.TNSRuleMinerNodeModel;
+import tns.TNSRuleMinerNodeModel;
 
 /**
  * <code>NodeDialog</code> for the "ERMiner" Node.

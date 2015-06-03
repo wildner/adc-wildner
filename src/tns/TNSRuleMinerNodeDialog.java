@@ -1,4 +1,4 @@
-package seqrulemining;
+package tns;
 
 import org.knime.core.data.DoubleValue;
 import org.knime.core.data.StringValue;
