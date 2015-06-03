@@ -2,7 +2,7 @@
  * $Revision$ $Date$ $Author$
  *
  */
-package tns;
+package seqrulemining;
 
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;

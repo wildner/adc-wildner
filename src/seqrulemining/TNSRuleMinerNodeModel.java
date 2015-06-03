@@ -1,4 +1,4 @@
-package tns;
+package seqrulemining;
 
 import java.io.File;
 import java.io.IOException;

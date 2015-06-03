@@ -4,12 +4,12 @@ Bundle-Name: TNSRuleMiner-Node extension for KNIME Workbench
 Bundle-SymbolicName: seqrulemining; singleton:=true
 Bundle-Version: 1.0.0
 Bundle-ClassPath: tnsruleminer.jar
-Bundle-Activator: tns.TNSRuleMinerNodePlugin
+Bundle-Activator: seqrulemining.TNSRuleMinerNodePlugin
 Bundle-Vendor: Manuel Wildner
 Require-Bundle: org.eclipse.core.runtime,
  org.knime.workbench.core,
  org.knime.workbench.repository,
  org.knime.base
 Bundle-ActivationPolicy: lazy
-Export-Package: tns
+Export-Package: seqrulemining
 
