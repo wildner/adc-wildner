@@ -2,7 +2,6 @@ package lssminer;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
@@ -12,7 +11,6 @@ import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.RowIterator;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.def.DefaultRow;
-import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
@@ -25,11 +23,6 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
-
-import ca.pfv.spmf.algorithms.sequential_rules.topseqrules_and_tns.AlgoTNS;
-import ca.pfv.spmf.algorithms.sequential_rules.topseqrules_and_tns.Rule;
-import ca.pfv.spmf.datastructures.redblacktree.RedBlackTree;
-import ca.pfv.spmf.input.sequence_database_array_integers.SequenceDatabase;
 
 /**
  * This is the model implementation of LSSMiner.
@@ -46,15 +39,19 @@ public class LSSMinerNodeModel extends NodeModel {
 	private SettingsModelString m_testSeqColumnSelection = createTestSeqColumnModel();
 	private SettingsModelString m_trainingSeqColumnSelection = createTrainingSeqColumnModel();
 	private SettingsModelIntegerBounded m_maxTestGapSelection = createMaxTestGapModel();
+	private SettingsModelIntegerBounded m_maxTrainGapSelection = createMaxTrainGapModel();
 	
 	private int maxTestGap = 1;
+	private int maxTrainGap = 5;
+	// TODO write a settingsmodel for it
+	private int minSeqLength = 5;
+	private int maxSeqLengthVariation = 1;
 	
     /**
      * Constructor for the node model.
      */
     protected LSSMinerNodeModel() {
     
-        // TODO: Specify the amount of input and output ports needed.
         super(2, 1);
     }
 
@@ -65,15 +62,15 @@ public class LSSMinerNodeModel extends NodeModel {
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
 
-		if (inData == null || inData[0] == null) {
+		if (inData == null || inData[0] == null || inData[1] == null) {
 			return inData;
 		}
 
 		// stores meta data about the tables
-		DataTableSpec inDataSpec0 = inData[0].getDataTableSpec();
+		DataTableSpec inDataSpec0 = inData[0].getDataTableSpec(); // test data
 		int rowNum0 = inData[0].getRowCount();
-		DataTableSpec inDataSpec1 = inData[0].getDataTableSpec();
-		int rowNum1 = inData[0].getRowCount();
+		DataTableSpec inDataSpec1 = inData[1].getDataTableSpec(); // training data
+		int rowNum1 = inData[1].getRowCount();
 		
 		/*
 		 * store the positions of needed columns.
@@ -84,12 +81,14 @@ public class LSSMinerNodeModel extends NodeModel {
 				.getStringValue());
 		
 		/*
-		 * update maxTestGap which is specified by the user
+		 * update parameters which are specified by the user
 		 */
 		maxTestGap = m_maxTestGapSelection.getIntValue();
+		maxTrainGap = m_maxTrainGapSelection.getIntValue();
 
 		RowIterator rowIter1 = inData[1].iterator();
 
+		// the structure of the output table
 		DataColumnSpec[] allColSpecs = new DataColumnSpec[2];
 		allColSpecs[0] = new DataColumnSpecCreator("RowID(Training)", StringCell.TYPE)
 				.createSpec();
@@ -97,36 +96,68 @@ public class LSSMinerNodeModel extends NodeModel {
 				.createSpec();
 		DataTableSpec outputSpec = new DataTableSpec(allColSpecs);
 
+		// stores the current longest shared sequence length
+		int[] lssLength = new int[rowNum0];
+		
 		// look for sequences in the training data
 		BufferedDataContainer container = exec.createDataContainer(outputSpec);
-		int rowCount = 0;
+		int rowCountOut = 0;
 		while(rowIter1.hasNext()) {
 			DataRow row1 = rowIter1.next();
 			String[] trainingTokens = ((StringCell) (row1
-					.getCell(seqColPos1))).getStringValue().split(" ");
+					.getCell(seqColPos1))).getStringValue().split(",");
+			StringBuilder stringBuilder = new StringBuilder();
+			boolean addARow = false;
+			int rowCountTest = 0;
 			RowIterator rowIter0 = inData[0].iterator();
 			while(rowIter0.hasNext()) {
 				DataRow row0 = rowIter0.next();
 				String[] testTokens = ((StringCell) (row0
-						.getCell(seqColPos0))).getStringValue().split(" ");
-				
+						.getCell(seqColPos0))).getStringValue().split(",");
+				int testPointer = rowNum0 - 1;
+				int foundCount = 0;
+				int trainGapCount = 0;
+				for (int i = trainingTokens.length - 1; i > -1; i--) {
+					if (trainGapCount <= maxTrainGap && testPointer - maxTestGap >= 0) {
+						for (int j = 0; j <= maxTestGap; j++) {
+							if(trainingTokens[i].equals(testTokens[testPointer - j])) {
+								foundCount++;
+								testPointer -= j + 1;
+								break;
+							}
+						}
+					}
+				}
+				if(foundCount >= minSeqLength
+						&& foundCount - maxSeqLengthVariation > lssLength[rowCountTest]) {
+					stringBuilder.append(row0.getKey().getString());
+					if (foundCount > lssLength[rowCountTest]) {
+						lssLength[rowCountTest] = foundCount;
+					}
+					if (!addARow) {
+						addARow = true;
+					}
+				}
+				rowCountTest++;
 			}
-			/*
-			 * Create the new row
-			 */
-			RowKey key = new RowKey("Row " + rowCount);
-			// the cells of the current row, the types of the cells must
-			// match the column spec (see above)
-			DataCell[] cells = new DataCell[2];
-			cells[0] = new StringCell(row1.getKey().getString());
-			cells[1] = new StringCell("Tags of row" + rowCount);
-			DataRow row = new DefaultRow(key, cells);
-			container.addRowToTable(row);
-			// check if the execution monitor was canceled
-			exec.checkCanceled();
-			exec.setProgress(rowCount / (double) rowNum1, "Adding row "
-					+ rowCount);
-			rowCount++;
+			if (addARow) {
+				/*
+				 * Create the new row
+				 */
+				RowKey key = new RowKey("Row " + rowCountOut);
+				// the cells of the current row, the types of the cells must
+				// match the column spec (see above)
+				DataCell[] cells = new DataCell[2];
+				cells[0] = new StringCell(row1.getKey().getString());
+				cells[1] = new StringCell(stringBuilder.toString());
+				DataRow row = new DefaultRow(key, cells);
+				container.addRowToTable(row);
+				// check if the execution monitor was canceled
+				exec.checkCanceled();
+				exec.setProgress(rowCountOut / (double) rowNum1, "Adding row "
+						+ rowCountOut);
+				rowCountOut++;
+			}
 		}
 		
 		container.close();
@@ -161,6 +192,7 @@ public class LSSMinerNodeModel extends NodeModel {
 		m_testSeqColumnSelection.saveSettingsTo(settings);
 		m_trainingSeqColumnSelection.saveSettingsTo(settings);
 		m_maxTestGapSelection.saveSettingsTo(settings);
+		m_maxTrainGapSelection.saveSettingsTo(settings);
     }
 
     /**
@@ -172,6 +204,7 @@ public class LSSMinerNodeModel extends NodeModel {
 		m_testSeqColumnSelection.loadSettingsFrom(settings);
 		m_trainingSeqColumnSelection.loadSettingsFrom(settings);
 		m_maxTestGapSelection.loadSettingsFrom(settings);
+		m_maxTrainGapSelection.loadSettingsFrom(settings);
     }
 
     /**
@@ -183,6 +216,7 @@ public class LSSMinerNodeModel extends NodeModel {
 		m_testSeqColumnSelection.validateSettings(settings);
 		m_trainingSeqColumnSelection.validateSettings(settings);
 		m_maxTestGapSelection.validateSettings(settings);
+		m_maxTrainGapSelection.validateSettings(settings);
     }
     
     /**
@@ -219,6 +253,10 @@ public class LSSMinerNodeModel extends NodeModel {
 
 	protected static SettingsModelIntegerBounded createMaxTestGapModel() {
 		return new SettingsModelIntegerBounded("max_test_gap_selection", 1, 0, 200);
+	}
+
+	protected static SettingsModelIntegerBounded createMaxTrainGapModel() {
+		return new SettingsModelIntegerBounded("max_train_gap_selection", 5, 0, 200);
 	}
 }
 
