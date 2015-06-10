@@ -16,6 +16,7 @@
    <extension point="org.knime.workbench.repository.nodes">
       <node category-path="/" factory-class="seqrulemining.TNSRuleMinerNodeFactory" id="seqrulemining.TNSRuleMinerNodeFactory"/>
    <node category-path="/" factory-class="erminer.ERMinerNodeFactory" id="erminer.ERMinerNodeFactory"/>
+<node category-path="/" factory-class="lssminer.LSSMinerNodeFactory" id="lssminer.LSSMinerNodeFactory"/>
 </extension>
    
 </plugin>
