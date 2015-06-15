@@ -114,7 +114,7 @@ public class LSSMinerNodeModel extends NodeModel {
 				DataRow row0 = rowIter0.next();
 				String[] testTokens = ((StringCell) (row0
 						.getCell(seqColPos0))).getStringValue().split(",");
-				int testPointer = rowNum0 - 1;
+				int testPointer = testTokens.length - 1;
 				int foundCount = 0;
 				int trainGapCount = 0;
 				for (int i = trainingTokens.length - 1; i > -1; i--) {
