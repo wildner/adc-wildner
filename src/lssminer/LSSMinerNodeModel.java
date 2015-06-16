@@ -11,6 +11,7 @@ import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.RowIterator;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.def.DefaultRow;
+import org.knime.core.data.def.IntCell;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
@@ -21,6 +22,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 
@@ -42,12 +44,16 @@ public class LSSMinerNodeModel extends NodeModel {
 	private SettingsModelIntegerBounded m_maxTrainGapSelection = createMaxTrainGapModel();
 	private SettingsModelIntegerBounded m_minSeqLengthSelection = createMinSeqLengthGapModel();
 	private SettingsModelIntegerBounded m_maxSeqLengthVariationSelection = createMaxSeqLengthVariationGapModel();
+	private SettingsModelBoolean m_appendSharedSeqLength = createAppendSharedSeqLengthModel();
+	private SettingsModelBoolean m_appendSharedSeq = createAppendSharedSeqModel();
 	
 	private int maxTestGap = 1;
 	private int maxTrainGap = 5;
 	// TODO write a settingsmodel for it
 	private int minSeqLength = 5;
 	private int maxSeqLengthVariation = 1;
+	private boolean appendSeqLength = true;
+	private boolean appendSeq = false;
 	
     /**
      * Constructor for the node model.
@@ -89,14 +95,16 @@ public class LSSMinerNodeModel extends NodeModel {
 		maxTrainGap = m_maxTrainGapSelection.getIntValue();
 		minSeqLength = m_minSeqLengthSelection.getIntValue();
 		maxSeqLengthVariation = m_maxSeqLengthVariationSelection.getIntValue();
+		appendSeqLength = m_appendSharedSeqLength.getBooleanValue();
+		appendSeq = m_appendSharedSeq.getBooleanValue();
 
 		RowIterator rowIter1 = inData[1].iterator();
 
 		// the structure of the output table
 		DataColumnSpec[] allColSpecs = new DataColumnSpec[2];
-		allColSpecs[0] = new DataColumnSpecCreator("RowID(Training)", StringCell.TYPE)
+		allColSpecs[0] = new DataColumnSpecCreator("RowID(Training)", IntCell.TYPE)
 				.createSpec();
-		allColSpecs[1] = new DataColumnSpecCreator("SupportTags", StringCell.TYPE)
+		allColSpecs[1] = new DataColumnSpecCreator("RowID(Test)", IntCell.TYPE)
 				.createSpec();
 		DataTableSpec outputSpec = new DataTableSpec(allColSpecs);
 
@@ -111,7 +119,6 @@ public class LSSMinerNodeModel extends NodeModel {
 			String[] trainingTokens = ((StringCell) (row1
 					.getCell(seqColPos1))).getStringValue().split(",");
 			StringBuilder stringBuilder = new StringBuilder();
-			boolean addARow = false;
 			int rowCountTest = 0;
 			RowIterator rowIter0 = inData[0].iterator();
 			while(rowIter0.hasNext()) {
@@ -134,33 +141,28 @@ public class LSSMinerNodeModel extends NodeModel {
 				}
 				if(foundCount >= minSeqLength
 						&& foundCount - maxSeqLengthVariation > lssLength[rowCountTest]) {
-					stringBuilder.append(row0.getKey().getString());
 					if (foundCount > lssLength[rowCountTest]) {
 						lssLength[rowCountTest] = foundCount;
 					}
-					if (!addARow) {
-						addARow = true;
-					}
+					/*
+					 * Create the new row
+					 */
+					RowKey key = new RowKey("Row " + rowCountOut);
+					int rowNumberTrain = Integer.parseInt(row1.getKey().getString().substring(3));
+					// the cells of the current row, the types of the cells must
+					// match the column spec (see above)
+					DataCell[] cells = new DataCell[2];
+					cells[0] = new IntCell(rowNumberTrain);
+					cells[1] = new IntCell(Integer.parseInt(row0.getKey().getString().substring(3)));
+					DataRow row = new DefaultRow(key, cells);
+					container.addRowToTable(row);
+					// check if the execution monitor was canceled
+					exec.checkCanceled();
+					exec.setProgress(rowNumberTrain / (double) rowNum1, "Adding row "
+							+ rowCountOut);
+					rowCountOut++;
 				}
 				rowCountTest++;
-			}
-			if (addARow) {
-				/*
-				 * Create the new row
-				 */
-				RowKey key = new RowKey("Row " + rowCountOut);
-				// the cells of the current row, the types of the cells must
-				// match the column spec (see above)
-				DataCell[] cells = new DataCell[2];
-				cells[0] = new StringCell(row1.getKey().getString());
-				cells[1] = new StringCell(stringBuilder.toString());
-				DataRow row = new DefaultRow(key, cells);
-				container.addRowToTable(row);
-				// check if the execution monitor was canceled
-				exec.checkCanceled();
-				exec.setProgress(rowCountOut / (double) rowNum1, "Adding row "
-						+ rowCountOut);
-				rowCountOut++;
 			}
 		}
 		
@@ -199,6 +201,8 @@ public class LSSMinerNodeModel extends NodeModel {
 		m_maxTrainGapSelection.saveSettingsTo(settings);
 		m_minSeqLengthSelection.saveSettingsTo(settings);
 		m_maxSeqLengthVariationSelection.saveSettingsTo(settings);
+		m_appendSharedSeqLength.saveSettingsTo(settings);
+		m_appendSharedSeq.saveSettingsTo(settings);
     }
 
     /**
@@ -213,6 +217,8 @@ public class LSSMinerNodeModel extends NodeModel {
 		m_maxTrainGapSelection.loadSettingsFrom(settings);
 		m_minSeqLengthSelection.loadSettingsFrom(settings);
 		m_maxSeqLengthVariationSelection.loadSettingsFrom(settings);
+		m_appendSharedSeqLength.loadSettingsFrom(settings);
+		m_appendSharedSeq.loadSettingsFrom(settings);
     }
 
     /**
@@ -227,6 +233,8 @@ public class LSSMinerNodeModel extends NodeModel {
 		m_maxTrainGapSelection.validateSettings(settings);
 		m_minSeqLengthSelection.validateSettings(settings);
 		m_maxSeqLengthVariationSelection.validateSettings(settings);
+		m_appendSharedSeqLength.validateSettings(settings);
+		m_appendSharedSeq.validateSettings(settings);
     }
     
     /**
@@ -275,6 +283,14 @@ public class LSSMinerNodeModel extends NodeModel {
 	
 	protected static SettingsModelIntegerBounded createMaxSeqLengthVariationGapModel() {
 		return new SettingsModelIntegerBounded("max_seq_length_variation_selection", 1, 0, 200);
+	}
+	
+	protected static SettingsModelBoolean createAppendSharedSeqLengthModel() {
+		return new SettingsModelBoolean("append_shared_seq_length", true);
+	}
+	
+	protected static SettingsModelBoolean createAppendSharedSeqModel() {
+		return new SettingsModelBoolean("append_shared_seq", false);
 	}
 }
 
