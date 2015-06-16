@@ -40,6 +40,8 @@ public class LSSMinerNodeModel extends NodeModel {
 	private SettingsModelString m_trainingSeqColumnSelection = createTrainingSeqColumnModel();
 	private SettingsModelIntegerBounded m_maxTestGapSelection = createMaxTestGapModel();
 	private SettingsModelIntegerBounded m_maxTrainGapSelection = createMaxTrainGapModel();
+	private SettingsModelIntegerBounded m_minSeqLengthSelection = createMinSeqLengthGapModel();
+	private SettingsModelIntegerBounded m_maxSeqLengthVariationSelection = createMaxSeqLengthVariationGapModel();
 	
 	private int maxTestGap = 1;
 	private int maxTrainGap = 5;
@@ -85,6 +87,8 @@ public class LSSMinerNodeModel extends NodeModel {
 		 */
 		maxTestGap = m_maxTestGapSelection.getIntValue();
 		maxTrainGap = m_maxTrainGapSelection.getIntValue();
+		minSeqLength = m_minSeqLengthSelection.getIntValue();
+		maxSeqLengthVariation = m_maxSeqLengthVariationSelection.getIntValue();
 
 		RowIterator rowIter1 = inData[1].iterator();
 
@@ -193,6 +197,8 @@ public class LSSMinerNodeModel extends NodeModel {
 		m_trainingSeqColumnSelection.saveSettingsTo(settings);
 		m_maxTestGapSelection.saveSettingsTo(settings);
 		m_maxTrainGapSelection.saveSettingsTo(settings);
+		m_minSeqLengthSelection.saveSettingsTo(settings);
+		m_maxSeqLengthVariationSelection.saveSettingsTo(settings);
     }
 
     /**
@@ -205,6 +211,8 @@ public class LSSMinerNodeModel extends NodeModel {
 		m_trainingSeqColumnSelection.loadSettingsFrom(settings);
 		m_maxTestGapSelection.loadSettingsFrom(settings);
 		m_maxTrainGapSelection.loadSettingsFrom(settings);
+		m_minSeqLengthSelection.loadSettingsFrom(settings);
+		m_maxSeqLengthVariationSelection.loadSettingsFrom(settings);
     }
 
     /**
@@ -217,6 +225,8 @@ public class LSSMinerNodeModel extends NodeModel {
 		m_trainingSeqColumnSelection.validateSettings(settings);
 		m_maxTestGapSelection.validateSettings(settings);
 		m_maxTrainGapSelection.validateSettings(settings);
+		m_minSeqLengthSelection.validateSettings(settings);
+		m_maxSeqLengthVariationSelection.validateSettings(settings);
     }
     
     /**
@@ -257,6 +267,14 @@ public class LSSMinerNodeModel extends NodeModel {
 
 	protected static SettingsModelIntegerBounded createMaxTrainGapModel() {
 		return new SettingsModelIntegerBounded("max_train_gap_selection", 5, 0, 200);
+	}
+	
+	protected static SettingsModelIntegerBounded createMinSeqLengthGapModel() {
+		return new SettingsModelIntegerBounded("min_seq_length_selection", 5, 0, 200);
+	}
+	
+	protected static SettingsModelIntegerBounded createMaxSeqLengthVariationGapModel() {
+		return new SettingsModelIntegerBounded("max_seq_length_variation_selection", 1, 0, 200);
 	}
 }
 
