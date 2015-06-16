@@ -97,15 +97,37 @@ public class LSSMinerNodeModel extends NodeModel {
 		maxSeqLengthVariation = m_maxSeqLengthVariationSelection.getIntValue();
 		appendSeqLength = m_appendSharedSeqLength.getBooleanValue();
 		appendSeq = m_appendSharedSeq.getBooleanValue();
+		
+		int numOutColumns;
+		if (appendSeq ^ appendSeqLength) {
+			numOutColumns = 3;
+		} else if(appendSeq && appendSeqLength) {
+			numOutColumns = 4;
+		} else {
+			numOutColumns = 2;
+		}
 
 		RowIterator rowIter1 = inData[1].iterator();
 
 		// the structure of the output table
-		DataColumnSpec[] allColSpecs = new DataColumnSpec[2];
+		DataColumnSpec[] allColSpecs = new DataColumnSpec[numOutColumns];
 		allColSpecs[0] = new DataColumnSpecCreator("RowID(Training)", IntCell.TYPE)
 				.createSpec();
 		allColSpecs[1] = new DataColumnSpecCreator("RowID(Test)", IntCell.TYPE)
 				.createSpec();
+		if(appendSeqLength) {
+			allColSpecs[2] = new DataColumnSpecCreator("SharedSeqLength", IntCell.TYPE)
+			.createSpec();
+		}
+		if(appendSeq) {
+			if(appendSeqLength) {
+				allColSpecs[3] = new DataColumnSpecCreator("SharedSeqence", StringCell.TYPE)
+				.createSpec();
+			} else {
+				allColSpecs[2] = new DataColumnSpecCreator("SharedSeqence", StringCell.TYPE)
+				.createSpec();
+			}
+		}
 		DataTableSpec outputSpec = new DataTableSpec(allColSpecs);
 
 		// stores the current longest shared sequence length
@@ -118,7 +140,6 @@ public class LSSMinerNodeModel extends NodeModel {
 			DataRow row1 = rowIter1.next();
 			String[] trainingTokens = ((StringCell) (row1
 					.getCell(seqColPos1))).getStringValue().split(",");
-			StringBuilder stringBuilder = new StringBuilder();
 			int rowCountTest = 0;
 			RowIterator rowIter0 = inData[0].iterator();
 			while(rowIter0.hasNext()) {
@@ -128,10 +149,14 @@ public class LSSMinerNodeModel extends NodeModel {
 				int testPointer = testTokens.length - 1;
 				int foundCount = 0;
 				int trainGapCount = 0;
+				StringBuilder stringBuilder = new StringBuilder();
 				for (int i = trainingTokens.length - 1; i > -1; i--) {
 					if (trainGapCount <= maxTrainGap && testPointer - maxTestGap >= 0) {
 						for (int j = 0; j <= maxTestGap; j++) {
 							if(trainingTokens[i].equals(testTokens[testPointer - j])) {
+								if(appendSeq) {
+									stringBuilder.insert(0, trainingTokens[i] + ",");
+								}
 								foundCount++;
 								testPointer -= j + 1;
 								break;
@@ -151,9 +176,21 @@ public class LSSMinerNodeModel extends NodeModel {
 					int rowNumberTrain = Integer.parseInt(row1.getKey().getString().substring(3));
 					// the cells of the current row, the types of the cells must
 					// match the column spec (see above)
-					DataCell[] cells = new DataCell[2];
+					DataCell[] cells = new DataCell[numOutColumns];
 					cells[0] = new IntCell(rowNumberTrain);
 					cells[1] = new IntCell(Integer.parseInt(row0.getKey().getString().substring(3)));
+					if(appendSeqLength) {
+						cells[2] = new IntCell(foundCount);
+					}
+					if(appendSeq) {
+						stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length());
+//						stringBuilder.reverse();
+						if(appendSeqLength) {
+							cells[3] = new StringCell(stringBuilder.toString());
+						} else {
+							cells[2] = new StringCell(stringBuilder.toString());
+						}
+					}
 					DataRow row = new DefaultRow(key, cells);
 					container.addRowToTable(row);
 					// check if the execution monitor was canceled
