@@ -7,11 +7,19 @@
     </shortDescription>
     
     <fullDescription>
-        <intro>Insert long description here...</intro>
+        <intro>The Longest Shared Sequence Miner looks for the longest subsequence of the test data inside the training sequences.
+        As soon as a sequence longer than (bestFound - MaxVariation) is found, it it added to the output table.
+        Therefore it it guaranteed that the longest shared sequence is included, but there may be also some former found sequences contained.</intro>
         
         
-        <option name="short name of first option (like in the dialog)">description of first option</option>
-        <option name="short name of second option (like in the dialog)">description of second option</option>
+        <option name="Test Column">Choose the Column (of the test table) which contains the test sequences.</option>
+        <option name="Training Column">Choose the Column (of the training table) which contains the training sequences.</option>
+        <option name="MaxGapTest">Choose how big the gap may be between two shared characters of the test sequence.</option>
+        <option name="MaxGapTraining">Choose how big the gap may be between two shared characters of the training sequence.</option>
+        <option name="MinSharedSeqLength">Choose how many shared characters have to be found at least.</option>
+        <option name="MaxLengthVariation">New found sequences must not necessarily be longer than the currently best found sequence but may differ by the specified amount of characters.</option>
+        <option name="AppendSharedSeqLength">Append the length of the found shared sequences.</option>
+        <option name="AppendSharedSeq">Append the found shared sequences (this may take 1/5 additional time).</option>
         <!-- possibly more options that can also be grouped by tabs -->
         <!--
         <tab name="Standard Options">
@@ -25,13 +33,15 @@
     </fullDescription>
     
     <ports>
-        <inPort index="0" name="In-Port name">Description of first input port...</inPort>
+        <inPort index="0" name="Test-Data">Test Data (usually the smaller table).</inPort>
+        <inPort index="1" name="Training-Data">Training Data.</inPort>
         <!-- possibly more input ports here-->
-        <outPort index="0" name="Out-Port name">Description of first output port...</outPort>
+        <outPort index="0" name="LSSMiner-Output">The longest shared sequences (depending on the parameters) plus some former found sequences.</outPort>
         <!-- possibly more output ports here-->
     </ports>    
+    <!--
     <views>
         <view index="0" name="name of first view">Description of first view...</view>
-        <!--view index="1" name="name of second view">Description of second view...</view-->
     </views>
+    -->
 </knimeNode>
