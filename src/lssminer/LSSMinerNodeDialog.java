@@ -30,7 +30,7 @@ public class LSSMinerNodeDialog extends DefaultNodeSettingsPane {
     	addDialogComponent(new DialogComponentColumnNameSelection(LSSMinerNodeModel.createTestSeqColumnModel(),
 				"Column containing the TEST sequences: ", 0, true, StringValue.class));
     	addDialogComponent(new DialogComponentColumnNameSelection(LSSMinerNodeModel.createTrainingSeqColumnModel(),
-				"Column containing the TRAINING sequences: ", 0, true, StringValue.class));
+				"Column containing the TRAINING sequences: ", 1, true, StringValue.class));
         addDialogComponent(new DialogComponentNumber(LSSMinerNodeModel.createMaxTestGapModel(), "Choose max gap in test sequence", 1));
         addDialogComponent(new DialogComponentNumber(LSSMinerNodeModel.createMaxTrainGapModel(), "Choose max gap in training sequence", 1));
         addDialogComponent(new DialogComponentNumber(LSSMinerNodeModel.createMinSeqLengthGapModel(), "Choose min shared sequence length", 1));
