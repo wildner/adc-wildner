@@ -8,7 +8,7 @@
     
     <fullDescription>
         <intro>The Longest Shared Sequence Miner looks for the longest subsequence of the test data inside the training sequences.
-        As soon as a sequence longer than (bestFound - MaxVariation) is found, it it added to the output table.
+        As soon as a sequence longer or equal than (bestFound - MaxVariation) is found, it it added to the output table.
         Therefore it it guaranteed that the longest shared sequence is included, but there may be also some former found sequences contained.</intro>
         
         
