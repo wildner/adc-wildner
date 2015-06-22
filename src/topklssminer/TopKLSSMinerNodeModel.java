@@ -23,6 +23,7 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelDoubleBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 
@@ -43,7 +44,8 @@ public class TopKLSSMinerNodeModel extends NodeModel {
 	private SettingsModelIntegerBounded m_maxTestGapSelection = createMaxTestGapModel();
 	private SettingsModelIntegerBounded m_maxTrainGapSelection = createMaxTrainGapModel();
 	private SettingsModelIntegerBounded m_minSeqLengthSelection = createMinSeqLengthGapModel();
-	private SettingsModelIntegerBounded m_maxSeqLengthVariationSelection = createMaxSeqLengthVariationGapModel();
+	private SettingsModelIntegerBounded m_topK = createTopKModel();
+	private SettingsModelDoubleBounded m_maxLengthDev = createMaxLenDevFromMaxModel();
 	private SettingsModelBoolean m_appendSharedSeqLength = createAppendSharedSeqLengthModel();
 	private SettingsModelBoolean m_appendSharedSeq = createAppendSharedSeqModel();
 	
@@ -51,7 +53,8 @@ public class TopKLSSMinerNodeModel extends NodeModel {
 	private int maxTrainGap = 5;
 	// TODO write a settingsmodel for it
 	private int minSeqLength = 5;
-	private int maxSeqLengthVariation = 1;
+	private int topK = 1;
+	private double maxLengthDevFromMax = 1;
 	private boolean appendSeqLength = true;
 	private boolean appendSeq = false;
 	
@@ -63,7 +66,8 @@ public class TopKLSSMinerNodeModel extends NodeModel {
         super(2, 1);
     }
 
-    /**
+
+	/**
      * {@inheritDoc}
      */
     @Override
@@ -94,7 +98,8 @@ public class TopKLSSMinerNodeModel extends NodeModel {
 		maxTestGap = m_maxTestGapSelection.getIntValue();
 		maxTrainGap = m_maxTrainGapSelection.getIntValue();
 		minSeqLength = m_minSeqLengthSelection.getIntValue();
-		maxSeqLengthVariation = m_maxSeqLengthVariationSelection.getIntValue();
+		topK = m_topK.getIntValue();
+		maxLengthDevFromMax = m_maxLengthDev.getDoubleValue();
 		appendSeqLength = m_appendSharedSeqLength.getBooleanValue();
 		appendSeq = m_appendSharedSeq.getBooleanValue();
 		
@@ -165,7 +170,7 @@ public class TopKLSSMinerNodeModel extends NodeModel {
 					}
 				}
 				if(foundCount >= minSeqLength
-						&& foundCount >= lssLength[rowCountTest] - maxSeqLengthVariation) {
+						&& foundCount >= lssLength[rowCountTest] - topK) {
 					if (foundCount > lssLength[rowCountTest]) {
 						lssLength[rowCountTest] = foundCount;
 					}
@@ -237,7 +242,8 @@ public class TopKLSSMinerNodeModel extends NodeModel {
 		m_maxTestGapSelection.saveSettingsTo(settings);
 		m_maxTrainGapSelection.saveSettingsTo(settings);
 		m_minSeqLengthSelection.saveSettingsTo(settings);
-		m_maxSeqLengthVariationSelection.saveSettingsTo(settings);
+		m_topK.saveSettingsTo(settings);
+		m_maxLengthDev.saveSettingsTo(settings);
 		m_appendSharedSeqLength.saveSettingsTo(settings);
 		m_appendSharedSeq.saveSettingsTo(settings);
     }
@@ -253,7 +259,8 @@ public class TopKLSSMinerNodeModel extends NodeModel {
 		m_maxTestGapSelection.loadSettingsFrom(settings);
 		m_maxTrainGapSelection.loadSettingsFrom(settings);
 		m_minSeqLengthSelection.loadSettingsFrom(settings);
-		m_maxSeqLengthVariationSelection.loadSettingsFrom(settings);
+		m_topK.loadSettingsFrom(settings);
+		m_maxLengthDev.loadSettingsFrom(settings);
 		m_appendSharedSeqLength.loadSettingsFrom(settings);
 		m_appendSharedSeq.loadSettingsFrom(settings);
     }
@@ -269,7 +276,8 @@ public class TopKLSSMinerNodeModel extends NodeModel {
 		m_maxTestGapSelection.validateSettings(settings);
 		m_maxTrainGapSelection.validateSettings(settings);
 		m_minSeqLengthSelection.validateSettings(settings);
-		m_maxSeqLengthVariationSelection.validateSettings(settings);
+		m_topK.validateSettings(settings);
+		m_maxLengthDev.validateSettings(settings);
 		m_appendSharedSeqLength.validateSettings(settings);
 		m_appendSharedSeq.validateSettings(settings);
     }
@@ -318,7 +326,7 @@ public class TopKLSSMinerNodeModel extends NodeModel {
 		return new SettingsModelIntegerBounded("min_seq_length_selection", 5, 0, 200);
 	}
 	
-	protected static SettingsModelIntegerBounded createMaxSeqLengthVariationGapModel() {
+	protected static SettingsModelIntegerBounded createTopKModel() {
 		return new SettingsModelIntegerBounded("max_seq_length_variation_selection", 1, 0, 200);
 	}
 	
@@ -328,6 +336,10 @@ public class TopKLSSMinerNodeModel extends NodeModel {
 	
 	protected static SettingsModelBoolean createAppendSharedSeqModel() {
 		return new SettingsModelBoolean("append_shared_seq", false);
+	}
+	
+	protected static SettingsModelDoubleBounded createMaxLenDevFromMaxModel() {
+		return new SettingsModelDoubleBounded("max_len_deviation_from_max", 1, 0, 1);
 	}
 }
 
