@@ -165,7 +165,7 @@ public class LSSMinerNodeModel extends NodeModel {
 					}
 				}
 				if(foundCount >= minSeqLength
-						&& foundCount > lssLength[rowCountTest] - maxSeqLengthVariation) {
+						&& foundCount >= lssLength[rowCountTest] - maxSeqLengthVariation) {
 					if (foundCount > lssLength[rowCountTest]) {
 						lssLength[rowCountTest] = foundCount;
 					}
