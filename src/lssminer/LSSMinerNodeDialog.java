@@ -10,7 +10,7 @@ import seqrulemining.TNSRuleMinerNodeModel;
 
 /**
  * <code>NodeDialog</code> for the "LSSMiner" Node.
- * The Longest Shared Sequence Miner looks for the longest subsequence of the test data inside the training sequences.
+ * The Top k Longest Shared Sequence Miner looks for the longest subsequence of the test data inside the training sequences.
  *
  * This node dialog derives from {@link DefaultNodeSettingsPane} which allows
  * creation of a simple dialog with standard components. If you need a more 

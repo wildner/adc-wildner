@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode icon="./default.png" type="Source" xmlns="http://knime.org/node/v2.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+    <name>TopKLSSMiner</name>
+    
+    <shortDescription>
+        The Top k Longest Shared Sequence Miner looks for the top k longest subsequences of the test data inside the training sequences.
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>The Top k Longest Shared Sequence Miner looks for the top k longest subsequences of the test data inside the training sequences.
+        As soon as a sequence longer or equal than (bestFound - MaxVariation) is found, it it added to the output table.
+        Therefore it it guaranteed that the longest shared sequence is included, but there may be also some former found sequences contained.</intro>
+        
+        
+        <option name="Test Column">Choose the Column (of the test table) which contains the test sequences.</option>
+        <option name="Training Column">Choose the Column (of the training table) which contains the training sequences.</option>
+        <option name="MaxGapTest">Choose how big the gap may be between two shared characters of the test sequence.</option>
+        <option name="MaxGapTraining">Choose how big the gap may be between two shared characters of the training sequence.</option>
+        <option name="MinSharedSeqLength">Choose how many shared characters have to be found at least.</option>
+        <option name="MaxLengthVariation">New found sequences must not necessarily be longer than the currently best found sequence but may differ by the specified amount of characters.</option>
+        <option name="AppendSharedSeqLength">Append the length of the found shared sequences.</option>
+        <option name="AppendSharedSeq">Append the found shared sequences (this may take 1/5 additional time).</option>
+        <!-- possibly more options that can also be grouped by tabs -->
+        <!--
+        <tab name="Standard Options">
+            <option name="short name of first option (like in the dialog)">description of first option</option>
+            <option name="short name of second option (like in the dialog)">description of second option</option>
+        </tab>
+        <tab name="Advanced Options">
+            <option name="short name of first advanced option (like in the dialog)">description of first advanced option</option>
+        </tab>
+        -->
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="Test-Data">Test Data (usually the smaller table).</inPort>
+        <inPort index="1" name="Training-Data">Training Data.</inPort>
+        <!-- possibly more input ports here-->
+        <outPort index="0" name="LSSMiner-Output">The longest shared sequences (depending on the parameters) plus some former found sequences.</outPort>
+        <!-- possibly more output ports here-->
+    </ports>    
+    <!--
+    <views>
+        <view index="0" name="name of first view">Description of first view...</view>
+    </views>
+    -->
+</knimeNode>

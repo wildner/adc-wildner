@@ -17,6 +17,7 @@
       <node category-path="/" factory-class="seqrulemining.TNSRuleMinerNodeFactory" id="seqrulemining.TNSRuleMinerNodeFactory"/>
    <node category-path="/" factory-class="erminer.ERMinerNodeFactory" id="erminer.ERMinerNodeFactory"/>
 <node category-path="/" factory-class="lssminer.LSSMinerNodeFactory" id="lssminer.LSSMinerNodeFactory"/>
+<node category-path="/" factory-class="topklssminer.TopKLSSMinerNodeFactory" id="topklssminer.TopKLSSMinerNodeFactory"/>
 </extension>
    
 </plugin>
