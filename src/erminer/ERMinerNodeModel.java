@@ -68,6 +68,7 @@ public class ERMinerNodeModel extends NodeModel {
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
 
+    	// test if input is null
 		if (inData == null || inData[0] == null) {
 			return inData;
 		}
