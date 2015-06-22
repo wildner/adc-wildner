@@ -2,6 +2,7 @@ package topklssminer;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
@@ -137,6 +138,7 @@ public class TopKLSSMinerNodeModel extends NodeModel {
 
 		// stores the current longest shared sequence length
 		int[] lssLength = new int[rowNum0];
+		TopDataRows[] topData = new TopDataRows[rowNum0];
 		
 		// look for sequences in the training data
 		BufferedDataContainer container = exec.createDataContainer(outputSpec);
@@ -174,6 +176,8 @@ public class TopKLSSMinerNodeModel extends NodeModel {
 					if (foundCount > lssLength[rowCountTest]) {
 						lssLength[rowCountTest] = foundCount;
 					}
+//				if(foundCount >= minSeqLength
+//						&& foundCount >= topData[rowCountTest].getMinSharedSequenceLength() - topK) {
 					/*
 					 * Create the new row
 					 */
@@ -197,7 +201,16 @@ public class TopKLSSMinerNodeModel extends NodeModel {
 						}
 					}
 					DataRow row = new DefaultRow(key, cells);
-					container.addRowToTable(row);
+					
+					// TopDataRow not yet initialized 
+					if (topData[rowCountTest] == null) {
+						topData[rowCountTest] = new TopDataRows(topK);
+					}
+					
+					// row is only added, when foundCount is higher then the MinSharedSequenceLength
+					topData[rowCountTest].addRow(row, foundCount);
+						
+//					container.addRowToTable(row);
 					// check if the execution monitor was canceled
 					exec.checkCanceled();
 					exec.setProgress(rowNumberTrain / (double) rowNum1, "Adding row "
@@ -206,6 +219,12 @@ public class TopKLSSMinerNodeModel extends NodeModel {
 				}
 				rowCountTest++;
 			}
+		}
+		
+		// fill output table
+		for (TopDataRows rows : topData) {
+			for (DataRow row: rows.getTopKDataRows())
+				container.addRowToTable(row);
 		}
 		
 		container.close();
