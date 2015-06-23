@@ -2,6 +2,7 @@ package topklssminer;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
@@ -136,8 +137,11 @@ public class TopKLSSMinerNodeModel extends NodeModel {
 		DataTableSpec outputSpec = new DataTableSpec(allColSpecs);
 
 		// stores the current longest shared sequence length
-		int[] lssLength = new int[rowNum0];
+//		int[] lssLength = new int[rowNum0];
 		TopDataRows[] topData = new TopDataRows[rowNum0];
+		for(int i = 0; i < topData.length; i++) {
+			topData[i] = new TopDataRows(topK);
+		}
 		
 		// look for sequences in the training data
 		BufferedDataContainer container = exec.createDataContainer(outputSpec);
@@ -170,13 +174,13 @@ public class TopKLSSMinerNodeModel extends NodeModel {
 						}
 					}
 				}
-				if(foundCount >= minSeqLength
-						&& foundCount >= lssLength[rowCountTest] - topK) {
-					if (foundCount > lssLength[rowCountTest]) {
-						lssLength[rowCountTest] = foundCount;
-					}
 //				if(foundCount >= minSeqLength
-//						&& foundCount >= topData[rowCountTest].getMinSharedSequenceLength() - topK) {
+//						&& foundCount >= lssLength[rowCountTest] - topK) {
+//					if (foundCount > lssLength[rowCountTest]) {
+//						lssLength[rowCountTest] = foundCount;
+//					}
+				if(foundCount >= minSeqLength
+						&& foundCount > topData[rowCountTest].getMinSharedSequenceLength()) {
 					/*
 					 * Create the new row
 					 */
@@ -201,10 +205,10 @@ public class TopKLSSMinerNodeModel extends NodeModel {
 					}
 					DataRow row = new DefaultRow(key, cells);
 					
-					// TopDataRow not yet initialized 
-					if (topData[rowCountTest] == null) {
-						topData[rowCountTest] = new TopDataRows(topK);
-					}
+//					// TopDataRow not yet initialized 
+//					if (topData[rowCountTest] == null) {
+//						topData[rowCountTest] = new TopDataRows(topK);
+//					}
 					
 					// row is only added, when foundCount is higher then the MinSharedSequenceLength
 					topData[rowCountTest].addRow(row, foundCount);
@@ -222,8 +226,13 @@ public class TopKLSSMinerNodeModel extends NodeModel {
 		
 		// fill output table
 		for (TopDataRows rows : topData) {
-			for (DataRow row: rows.getTopKDataRows())
-				container.addRowToTable(row);
+			int max = rows.getMaxSharedSequenceLength();
+			for (int i = 0; i < rows.getTopKDataRows().size(); i++) {
+				if (rows.getSSL(i) >= max * maxLengthDevFromMax) {
+					// Drop all rows whose seqLength is below a certain fraction of the maxLength of the corresponding test rows
+					container.addRowToTable(rows.getTopKDataRows().get(i));
+				}
+			}
 		}
 		
 		container.close();
@@ -345,7 +354,7 @@ public class TopKLSSMinerNodeModel extends NodeModel {
 	}
 	
 	protected static SettingsModelIntegerBounded createTopKModel() {
-		return new SettingsModelIntegerBounded("max_seq_length_variation_selection", 1, 0, 200);
+		return new SettingsModelIntegerBounded("top_k_selection", 1, 1, 200);
 	}
 	
 	protected static SettingsModelBoolean createAppendSharedSeqLengthModel() {

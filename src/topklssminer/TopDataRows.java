@@ -29,23 +29,48 @@ public class TopDataRows {
 	 * This method returns the minimum shared sequence length.
 	 */
 	public int getMinSharedSequenceLength() {
-		return topKDataRows.get(minIndex).getSharedseqLength();
+		if(topKDataRows.size() < k || minIndex == -1) {
+			return 0;
+		} else {
+			return topKDataRows.get(minIndex).getSharedseqLength();
+		}
+	}
+	
+	/**
+	 * This method returns the maximum shared sequence length.
+	 */
+	public int getMaxSharedSequenceLength() {
+		if(topKDataRows.size() < 1 || minIndex == -1) {
+			return 0;
+		} else {
+			int max = 0;
+			for (int i = 0; i < topKDataRows.size(); i++) {
+				if(topKDataRows.get(i).getSharedseqLength() > max) {
+					max = topKDataRows.get(i).getSharedseqLength();
+				}
+			}
+			return max;
+		}
 	}
 
+	public int getSSL(int index) {
+		return topKDataRows.get(index).getSharedseqLength();
+	}
 
 	public void addRow(DataRow row, int foundCount) {
 		if (topKDataRows.size() >= k ) {
+			
 			// get Min
-			for (int i = 0; i < topKDataRows.size(); i++) {
-				Item item = topKDataRows.get(i);
+//			for (int i = 0; i < topKDataRows.size(); i++) {
+//				Item item = topKDataRows.get(i);
 				// new Item has longer shared sequence?  --> replace Min ( set DataRow and Count, updateMinIndex)
-				if ( foundCount > getMinSharedSequenceLength() ) {
+				if (foundCount > topKDataRows.get(minIndex).getSharedseqLength()) {
 					topKDataRows.get(minIndex).setRow(row);
 					topKDataRows.get(minIndex).setSharedseqLength(foundCount);
 					
 					updateMinIndex();
 				}
-			}
+//			}
 		}
 //		else if (topKDataRows.size() < k) {
 		else {
@@ -59,21 +84,23 @@ public class TopDataRows {
 	
 	
 	private void updateMinIndex() {
-		if (topKDataRows.size() < 1) {
-			this.minIndex = -1;
-			return;
-		}
-		Item item1 = topKDataRows.get(0);
+//		if (topKDataRows.size() < 1) {
+//			this.minIndex = -1;
+//			return;
+//		}
+		int minFoundLength = topKDataRows.get(0).getSharedseqLength();
 		this.minIndex = 0;
-		for (int i = 1; i< topKDataRows.size(); i++) {
-			if (topKDataRows.get(i).getSharedseqLength() < item1.getSharedseqLength())
+		for (int i = 1; i < topKDataRows.size(); i++) {
+			if (topKDataRows.get(i).getSharedseqLength() < minFoundLength) {
 				minIndex = i;
+				minFoundLength = topKDataRows.get(i).getSharedseqLength();
+			}
 		}
 		
 	}
 	
 	/**
-	 * I created this helper class, because 'foundCount' is might not always be present in the DataRow,
+	 * I created this helper class, because 'foundCount' might not always be present in the DataRow,
 	 * when it is not activated.  
 	 * @author michaelhundt
 	 *

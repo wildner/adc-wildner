@@ -33,7 +33,7 @@ public class TopKLSSMinerNodeDialog extends DefaultNodeSettingsPane {
         addDialogComponent(new DialogComponentNumber(TopKLSSMinerNodeModel.createMaxTrainGapModel(), "Choose max gap in training sequence", 1));
         addDialogComponent(new DialogComponentNumber(TopKLSSMinerNodeModel.createMinSeqLengthGapModel(), "Choose min shared sequence length", 1));
         addDialogComponent(new DialogComponentNumber(TopKLSSMinerNodeModel.createTopKModel(), "Choose top k values", 1));
-        addDialogComponent(new DialogComponentNumber(TopKLSSMinerNodeModel.createMaxLenDevFromMaxModel(), "Choose the maximum length deviation from the maximum", 0.05));
+        addDialogComponent(new DialogComponentNumber(TopKLSSMinerNodeModel.createMaxLenDevFromMaxModel(), "Include fraction of maxLength", 0.05));
         addDialogComponent(new DialogComponentBoolean(TopKLSSMinerNodeModel.createAppendSharedSeqLengthModel(), "Append length of shared sequence"));
         addDialogComponent(new DialogComponentBoolean(TopKLSSMinerNodeModel.createAppendSharedSeqModel(), "Append the shared sequence itself"));
     }
