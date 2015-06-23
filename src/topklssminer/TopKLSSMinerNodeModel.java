@@ -156,7 +156,7 @@ public class TopKLSSMinerNodeModel extends NodeModel {
 				int foundCount = 0;
 				int trainGapCount = 0;
 				StringBuilder stringBuilder = new StringBuilder();
-				for (int i = trainingTokens.length - 1; i > -1; i--) {
+				for (int i = trainingTokens.length - 1; i >= 0; i--) {
 					if (trainGapCount <= maxTrainGap && testPointer - maxTestGap >= 0) {
 						for (int j = 0; j <= maxTestGap; j++) {
 							if(trainingTokens[i].equals(testTokens[testPointer - j])) {
@@ -341,7 +341,7 @@ public class TopKLSSMinerNodeModel extends NodeModel {
 	}
 	
 	protected static SettingsModelIntegerBounded createMinSeqLengthGapModel() {
-		return new SettingsModelIntegerBounded("min_seq_length_selection", 5, 0, 200);
+		return new SettingsModelIntegerBounded("min_seq_length_selection", 5, 1, 200);
 	}
 	
 	protected static SettingsModelIntegerBounded createTopKModel() {
