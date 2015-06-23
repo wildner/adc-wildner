@@ -103,7 +103,6 @@ public class TopDataRows {
 			this.row = row;
 		}
 		
-		
 	}
 	
 	

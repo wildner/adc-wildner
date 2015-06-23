@@ -2,7 +2,6 @@ package topklssminer;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
