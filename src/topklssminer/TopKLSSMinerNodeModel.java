@@ -183,7 +183,7 @@ public class TopKLSSMinerNodeModel extends NodeModel {
 					// match the column spec (see above)
 					DataCell[] cells = new DataCell[numOutColumns];
 					cells[0] = new IntCell(rowNumberTrain);
-					cells[1] = new IntCell(Integer.parseInt(row0.getKey().getString().substring(3)));
+					cells[1] = new IntCell(Integer.parseInt(row0.getKey().getString().substring(1)));
 					if(appendSeqLength) {
 						cells[2] = new IntCell(foundCount);
 					}
