@@ -184,7 +184,7 @@ public class TopKLSSMinerNodeModel extends NodeModel {
 					/*
 					 * Create the new row
 					 */
-					RowKey key = new RowKey("Row " + rowCountOut);
+					RowKey key = new RowKey("Row" + rowCountOut);
 					int rowNumberTrain = Integer.parseInt(row1.getKey().getString().substring(3));
 					// the cells of the current row, the types of the cells must
 					// match the column spec (see above)
