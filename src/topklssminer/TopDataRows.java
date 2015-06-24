@@ -4,6 +4,11 @@ import java.util.ArrayList;
 
 import org.knime.core.data.DataRow;
 
+/**
+ * This Class stores the top k DataRows
+ * @author Michael Hundt
+ *
+ */
 public class TopDataRows {
 	
 	private ArrayList<Item> topKDataRows;
@@ -16,7 +21,10 @@ public class TopDataRows {
 		topKDataRows = new ArrayList<>(k);
 	}
 
-
+	/**
+	 * This methods retruns the top k DataRows 
+	 * @return ArrayList<DataRow>
+	 */
 	public ArrayList<DataRow> getTopKDataRows() {
 		ArrayList<DataRow> output = new ArrayList<>();
 		for (Item item : topKDataRows) {
@@ -26,7 +34,7 @@ public class TopDataRows {
 	}
 	
 	/**
-	 * This method returns the minimum shared sequence length.
+	 * This method returns the minimum shared sequence length
 	 */
 	public int getMinSharedSequenceLength() {
 		if(topKDataRows.size() < k || minIndex == -1) {
@@ -53,26 +61,27 @@ public class TopDataRows {
 		}
 	}
 
+	/**
+	 * This method returns the shared sequence length of the DataRow with index i
+	 * @param index
+	 * @return shared sequence length of i
+	 */
 	public int getSSL(int index) {
 		return topKDataRows.get(index).getSharedseqLength();
 	}
 
 	public void addRow(DataRow row, int foundCount) {
 		if (topKDataRows.size() >= k ) {
-			
 			// get Min
-//			for (int i = 0; i < topKDataRows.size(); i++) {
-//				Item item = topKDataRows.get(i);
-				// new Item has longer shared sequence?  --> replace Min ( set DataRow and Count, updateMinIndex)
-				if (foundCount > topKDataRows.get(minIndex).getSharedseqLength()) {
-					topKDataRows.get(minIndex).setRow(row);
-					topKDataRows.get(minIndex).setSharedseqLength(foundCount);
-					
-					updateMinIndex();
-				}
-//			}
+			// new Item has longer shared sequence? --> replace Min ( set
+			// DataRow and Count, updateMinIndex)
+			if (foundCount > topKDataRows.get(minIndex).getSharedseqLength()) {
+				topKDataRows.get(minIndex).setRow(row);
+				topKDataRows.get(minIndex).setSharedseqLength(foundCount);
+
+				updateMinIndex();
+			}
 		}
-//		else if (topKDataRows.size() < k) {
 		else {
 			Item item = new Item(foundCount, row);
 			topKDataRows.add(item);
@@ -84,10 +93,7 @@ public class TopDataRows {
 	
 	
 	private void updateMinIndex() {
-//		if (topKDataRows.size() < 1) {
-//			this.minIndex = -1;
-//			return;
-//		}
+		// update always after an add, therefore never empty ..
 		int minFoundLength = topKDataRows.get(0).getSharedseqLength();
 		this.minIndex = 0;
 		for (int i = 1; i < topKDataRows.size(); i++) {
@@ -96,13 +102,12 @@ public class TopDataRows {
 				minFoundLength = topKDataRows.get(i).getSharedseqLength();
 			}
 		}
-		
 	}
 	
 	/**
 	 * I created this helper class, because 'foundCount' might not always be present in the DataRow,
 	 * when it is not activated.  
-	 * @author michaelhundt
+	 * @author Michael Hundt
 	 *
 	 */
 	private class Item {
@@ -129,8 +134,6 @@ public class TopDataRows {
 		public void setRow(DataRow row) {
 			this.row = row;
 		}
-		
 	}
-	
 	
 }

@@ -52,7 +52,6 @@ public class TopKLSSMinerNodeModel extends NodeModel {
 	
 	private int maxTestGap = 1;
 	private int maxTrainGap = 5;
-	// TODO write a settingsmodel for it
 	private int minSeqLength = 5;
 	private int topK = 1;
 	private double maxLengthDevFromMax = 1;
@@ -137,7 +136,6 @@ public class TopKLSSMinerNodeModel extends NodeModel {
 		DataTableSpec outputSpec = new DataTableSpec(allColSpecs);
 
 		// stores the current longest shared sequence length
-//		int[] lssLength = new int[rowNum0];
 		TopDataRows[] topData = new TopDataRows[rowNum0];
 		for(int i = 0; i < topData.length; i++) {
 			topData[i] = new TopDataRows(topK);
@@ -174,11 +172,6 @@ public class TopKLSSMinerNodeModel extends NodeModel {
 						}
 					}
 				}
-//				if(foundCount >= minSeqLength
-//						&& foundCount >= lssLength[rowCountTest] - topK) {
-//					if (foundCount > lssLength[rowCountTest]) {
-//						lssLength[rowCountTest] = foundCount;
-//					}
 				if(foundCount >= minSeqLength
 						&& foundCount > topData[rowCountTest].getMinSharedSequenceLength()) {
 					/*
@@ -196,7 +189,6 @@ public class TopKLSSMinerNodeModel extends NodeModel {
 					}
 					if(appendSeq) {
 						stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length());
-//						stringBuilder.reverse();
 						if(appendSeqLength) {
 							cells[3] = new StringCell(stringBuilder.toString());
 						} else {
@@ -205,15 +197,9 @@ public class TopKLSSMinerNodeModel extends NodeModel {
 					}
 					DataRow row = new DefaultRow(key, cells);
 					
-//					// TopDataRow not yet initialized 
-//					if (topData[rowCountTest] == null) {
-//						topData[rowCountTest] = new TopDataRows(topK);
-//					}
-					
 					// row is only added, when foundCount is higher then the MinSharedSequenceLength
 					topData[rowCountTest].addRow(row, foundCount);
 						
-//					container.addRowToTable(row);
 					// check if the execution monitor was canceled
 					exec.checkCanceled();
 					exec.setProgress(rowNumberTrain / (double) rowNum1, "Adding row "
