@@ -159,17 +159,32 @@ public class TopKLSSMinerNodeModel extends NodeModel {
 				int trainGapCount = 0;
 				StringBuilder stringBuilder = new StringBuilder();
 				for (int i = trainingTokens.length - 1; i >= 0; i--) {
-					if (trainGapCount <= maxTrainGap && testPointer - maxTestGap >= 0) {
+					if (trainGapCount <= maxTrainGap) {
+						int currFoundCount = foundCount;
 						for (int j = 0; j <= maxTestGap; j++) {
-							if(trainingTokens[i].equals(testTokens[testPointer - j])) {
-								if(appendSeq) {
-									stringBuilder.insert(0, trainingTokens[i] + ",");
+							if (testPointer >= 0) {
+								if (trainingTokens[i]
+										.equals(testTokens[testPointer - j])) {
+									if (appendSeq) {
+										stringBuilder.insert(0,
+												trainingTokens[i] + ",");
+									}
+									foundCount++;
+									trainGapCount = 0;
+									testPointer -= (j + 1);
+									break;
 								}
-								foundCount++;
-								testPointer -= j + 1;
+							} else {
 								break;
 							}
 						}
+						if (foundCount > currFoundCount) {
+							if (foundCount > 0) {
+								trainGapCount++;
+							}
+						}
+					} else {
+						break;
 					}
 				}
 				if(foundCount >= minSeqLength
