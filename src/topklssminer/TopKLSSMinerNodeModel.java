@@ -162,7 +162,7 @@ public class TopKLSSMinerNodeModel extends NodeModel {
 					if (trainGapCount <= maxTrainGap) {
 						int currFoundCount = foundCount;
 						for (int j = 0; j <= maxTestGap; j++) {
-							if (testPointer >= 0) {
+							if (testPointer - j >= 0) {
 								if (trainingTokens[i]
 										.equals(testTokens[testPointer - j])) {
 									if (appendSeq) {
