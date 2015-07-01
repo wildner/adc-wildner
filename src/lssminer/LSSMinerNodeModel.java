@@ -153,7 +153,8 @@ public class LSSMinerNodeModel extends NodeModel {
 				for (int i = trainingTokens.length - 1; i >= 0; i--) {
 					if (trainGapCount <= maxTrainGap) {
 						int currFoundCount = foundCount;
-						for (int j = 0; j <= maxTestGap; j++) {
+						int testLoopRange = (foundCount > 0) ? maxTestGap : testTokens.length - 1;
+						for (int j = 0; j <= testLoopRange; j++) {
 							if (testPointer - j >= 0) {
 								if (trainingTokens[i]
 										.equals(testTokens[testPointer - j])) {
