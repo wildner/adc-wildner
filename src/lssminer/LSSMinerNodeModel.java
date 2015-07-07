@@ -323,19 +323,19 @@ public class LSSMinerNodeModel extends NodeModel {
 	}
 
 	protected static SettingsModelIntegerBounded createMaxTestGapModel() {
-		return new SettingsModelIntegerBounded("max_test_gap_selection", 1, 0, 200);
+		return new SettingsModelIntegerBounded("max_test_gap_selection", 1, 0, 100000);
 	}
 
 	protected static SettingsModelIntegerBounded createMaxTrainGapModel() {
-		return new SettingsModelIntegerBounded("max_train_gap_selection", 5, 0, 200);
+		return new SettingsModelIntegerBounded("max_train_gap_selection", 5, 0, 100000);
 	}
 	
 	protected static SettingsModelIntegerBounded createMinSeqLengthGapModel() {
-		return new SettingsModelIntegerBounded("min_seq_length_selection", 5, 1, 200);
+		return new SettingsModelIntegerBounded("min_seq_length_selection", 5, 1, 100000);
 	}
 	
 	protected static SettingsModelIntegerBounded createMaxSeqLengthVariationGapModel() {
-		return new SettingsModelIntegerBounded("max_seq_length_variation_selection", 1, 0, 200);
+		return new SettingsModelIntegerBounded("max_seq_length_variation_selection", 1, 0, 100000);
 	}
 	
 	protected static SettingsModelBoolean createAppendSharedSeqLengthModel() {
